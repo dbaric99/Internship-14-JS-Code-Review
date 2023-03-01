@@ -1,0 +1,9 @@
+.code-container {
+    height: 80vh;
+    width: 70vw;
+    background-color: var(--black);
+    color: var(--white);
+    font-family: serif;
+    font-size: 20px;
+    padding: 30px 50px;
+}
