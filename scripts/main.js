@@ -18,15 +18,14 @@ fetchCodeBlocks().then(codeBlock => {
     var codeLines = codeBlock.code.split('\n');
     codeLines.forEach((line, index) => {
         const lineIndex = document.createElement('span');
-        lineIndex.classList.add = 'code-line__index';
-        lineIndex.innerHTML = index;
+        lineIndex.classList.add('code-line__index');
+        lineIndex.textContent = index + 1;
 
         const element = document.createElement('div');
-        element.classList.add = 'code-line';
+        element.classList.add('code-line');
         element.appendChild(lineIndex);
-        element.innerHTML = line.replace(/ /g, '&nbsp;');
+        element.innerHTML += line.replace(/ /g, '&nbsp;&nbsp;');
 
         codeContainer.appendChild(element);
-    })
-    console.log(codeLines);
+    });
 });
