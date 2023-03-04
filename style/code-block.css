@@ -16,4 +16,15 @@
 .code-line__index {
     padding-right: 10px;
     color: var(--gray);
+    cursor: pointer;
+}
+
+.code-line--highlighted {
+    background-color: var(--white);
+    color: var(--black);
+}
+
+.code-line-wrapper {
+    display: flex;
+    flex-direction: column;
 }

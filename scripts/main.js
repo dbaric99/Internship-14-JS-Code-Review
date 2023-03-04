@@ -21,11 +21,46 @@ fetchCodeBlocks().then(codeBlock => {
         lineIndex.classList.add('code-line__index');
         lineIndex.textContent = index + 1;
 
-        const element = document.createElement('div');
+        const element = document.createElement('pre');
         element.classList.add('code-line');
         element.appendChild(lineIndex);
-        element.innerHTML += line.replace(/ /g, '&nbsp;&nbsp;');
+        element.innerHTML += line;
 
-        codeContainer.appendChild(element);
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('code-line-wrapper');
+        wrapper.appendChild(element);
+
+        element.bindListeners({'mouseenter': lineMouseEnterHandler, 'mouseleave': lineMouseLeaveHandler, 'click': lineClickHandler});
+
+        
+
+        codeContainer.appendChild(wrapper);
     });
 });
+
+const lineMouseEnterHandler = (e) => {
+    e.target.classList.add('code-line--highlighted');
+}
+
+const lineMouseLeaveHandler = (e) => {
+    e.target.classList.remove('code-line--highlighted');
+}
+
+const lineClickHandler = (e) => {
+    if(e.target.tagName === 'SPAN') {
+        console.log("OPEN COMMENT SECTION")
+    }
+}
+
+HTMLElement.prototype.bindListeners = function(eventListeners) {
+    for (let eventType in eventListeners) {
+        this.addEventListener(eventType, eventListeners[eventType]);
+    }
+}
+
+HTMLElement.prototype.appendCommentSection = function() {
+    const wrapper = document.createElement('div'); // --switch display
+    
+
+    this.appendChild(wrapper);
+}
