@@ -1,18 +1,27 @@
-const handleCharCount = (e) => {
+const baseUrl = 'https://homework-server1.onrender.com';
+const key = 'dbaric99';
+
+const handleUpdateInput = (e) => {
     let currentCharCounter = document.querySelector('.count__current');
     currentCharCounter.textContent = e.target.value.length;
+    disableButtons();
 }
 
 const handleSendPrivate = (e) => {
+    var isEmpty = !(commentInputBox.querySelector('.comment-text-holder').value.length);
+    if(isEmpty) return;
     console.log("HANDLE SEND PRIVATE");
+    toggleCommentSection();
 }
 
 const handleSendServer = (e) => {
+    var isEmpty = !(commentInputBox.querySelector('.comment-text-holder').value.length);
+    if(isEmpty) return;
+    console.log(isEmpty);
     console.log("HANDLE SEND SERVER");
+    toggleCommentSection();
 }
 
-const baseUrl = 'https://homework-server1.onrender.com';
-const key = 'dbaric99';
 const codeContainer = document.querySelector('.code-container');
 const commentInputBox = getCommentAndBindListeners();
 
@@ -74,16 +83,36 @@ HTMLElement.prototype.bindListeners = function(eventListeners) {
 HTMLElement.prototype.appendCommentSection = function() {
     commentInputBox.querySelector('.comment-text-holder').value = '';
     this.appendChild(commentInputBox);
-    commentInputBox.style.display = 'block';
+    toggleCommentSection('block');
+}
+
+function toggleCommentSection(display) {
+    let currentDisplay = commentInputBox.style.display;
+    if(display) {
+        commentInputBox.style.display = display;
+        return;
+    }
+    commentInputBox.style.display = currentDisplay === 'none' ? 'block' : 'none';
 }
 
 function getCommentAndBindListeners() {
     let commentElement = document.getElementById('comment-wrapper');
 
-    commentElement.querySelector('.comment-text-holder').addEventListener('keyup', handleCharCount);
+    commentElement.querySelector('.comment-text-holder').addEventListener('keyup', handleUpdateInput);
 
     commentElement.querySelector('.send-private').addEventListener('click', handleSendPrivate);
     commentElement.querySelector('.send').addEventListener('click', handleSendServer);
     
     return commentElement;
 }
+
+function disableButtons() {
+    let currentCharCounter = document.querySelector('.count__current');
+    let buttons = document.querySelectorAll('.btn-comment');
+    if(parseInt(currentCharCounter.textContent) === 0) {
+        buttons.forEach(btn => btn.classList.add('btn--disable'));
+    } else {
+        buttons.forEach(btn => btn.classList.remove('btn--disable'));
+    }
+}
+disableButtons();
