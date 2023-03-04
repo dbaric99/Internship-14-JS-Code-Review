@@ -1,6 +1,19 @@
+const handleCharCount = (e) => {
+    console.log("HANDLE CHAR COUNT");
+}
+
+const handleSendPrivate = (e) => {
+    console.log("HANDLE SEND PRIVATE");
+}
+
+const handleSendServer = (e) => {
+    console.log("HANDLE SEND SERVER");
+}
+
 const baseUrl = 'https://homework-server1.onrender.com';
 const key = 'dbaric99';
 const codeContainer = document.querySelector('.code-container');
+const commentInputBox = getCommentAndBindListeners();
 
 console.log("something is happening");
 
@@ -32,8 +45,6 @@ fetchCodeBlocks().then(codeBlock => {
 
         element.bindListeners({'mouseenter': lineMouseEnterHandler, 'mouseleave': lineMouseLeaveHandler, 'click': lineClickHandler});
 
-        
-
         codeContainer.appendChild(wrapper);
     });
 });
@@ -48,7 +59,8 @@ const lineMouseLeaveHandler = (e) => {
 
 const lineClickHandler = (e) => {
     if(e.target.tagName === 'SPAN') {
-        console.log("OPEN COMMENT SECTION")
+        let holder = e.target.closest('.code-line-wrapper');
+        holder.appendCommentSection();
     }
 }
 
@@ -59,8 +71,18 @@ HTMLElement.prototype.bindListeners = function(eventListeners) {
 }
 
 HTMLElement.prototype.appendCommentSection = function() {
-    const wrapper = document.createElement('div'); // --switch display
-    
+    commentInputBox.querySelector('.comment-text-holder').value = '';
+    this.appendChild(commentInputBox);
+    commentInputBox.style.display = 'block';
+}
 
-    this.appendChild(wrapper);
+function getCommentAndBindListeners() {
+    let commentElement = document.getElementById('comment-wrapper');
+
+    commentElement.querySelector('.comment-text-holder').addEventListener('keydown', handleCharCount);
+
+    commentElement.querySelector('.send-private').addEventListener('click', handleSendPrivate);
+    commentElement.querySelector('.send').addEventListener('click', handleSendServer);
+    
+    return commentElement;
 }

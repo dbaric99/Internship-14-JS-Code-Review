@@ -1,4 +1,4 @@
-.comment-wrapper {
+#comment-wrapper {
     background-color: var(--white);
     width: 80%;
     border-radius: 10px;
@@ -6,9 +6,10 @@
     padding-bottom: 20px;
     padding-left: 20px;
     padding-right: 20px;
+    display: none;
 }
 
-.comment-wrapper:before {
+#comment-wrapper:before {
     content: '';
     transform: translate(34px, -18px);
     display: block;

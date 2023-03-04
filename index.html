@@ -9,33 +9,29 @@
     <title>Code Review</title>
   </head>
   <body>
-    <div class="code-container">
-      <div class="code-line-wrapper">
-        <pre
-          class="code-line"
-        ><span class="code-line__index">1</span>import { DataType, Model, NUMBER } from 'sequelize';</pre>
+    <div class="code-container"></div>
 
-        <div class="comment-wrapper">
-          <textarea
-            class="comment-text-holder"
-            placeholder="Type your comment here..."
-            maxlength="160"
-          ></textarea>
-          <div class="char-count">
-            <span class="count__current">0</span>
-            <span class="count__maximum">/ 160</span>
-          </div>
-          <div class="btn-holder">
-            <div class="btn send-private">Send private</div>
-            <div class="btn send">
-              Send
-              <i class="fa fa-paper-plane-o"></i>
-            </div>
-          </div>
+    <div id="comment-wrapper">
+      <textarea
+        class="comment-text-holder"
+        placeholder="Type your comment here..."
+        maxlength="160"
+      ></textarea>
+
+      <div class="char-count">
+        <span class="count__current">0</span>
+        <span class="count__maximum">/ 160</span>
+      </div>
+
+      <div class="btn-holder">
+        <div class="btn send-private">Send private</div>
+        <div class="btn send">
+          Send
+          <i class="fa fa-paper-plane-o"></i>
         </div>
       </div>
     </div>
 
-    <!-- <script src="./scripts/main.js"></script> -->
+    <script src="./scripts/main.js"></script>
   </body>
 </html>
