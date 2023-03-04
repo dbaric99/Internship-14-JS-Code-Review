@@ -1,5 +1,6 @@
 const handleCharCount = (e) => {
-    console.log("HANDLE CHAR COUNT");
+    let currentCharCounter = document.querySelector('.count__current');
+    currentCharCounter.textContent = e.target.value.length;
 }
 
 const handleSendPrivate = (e) => {
@@ -79,7 +80,7 @@ HTMLElement.prototype.appendCommentSection = function() {
 function getCommentAndBindListeners() {
     let commentElement = document.getElementById('comment-wrapper');
 
-    commentElement.querySelector('.comment-text-holder').addEventListener('keydown', handleCharCount);
+    commentElement.querySelector('.comment-text-holder').addEventListener('keyup', handleCharCount);
 
     commentElement.querySelector('.send-private').addEventListener('click', handleSendPrivate);
     commentElement.querySelector('.send').addEventListener('click', handleSendServer);
