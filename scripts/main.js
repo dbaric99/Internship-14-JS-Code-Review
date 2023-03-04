@@ -8,17 +8,24 @@ const handleUpdateInput = (e) => {
 }
 
 const handleSendPrivate = (e) => {
-    var isEmpty = !(commentInputBox.querySelector('.comment-text-holder').value.length);
+    let commentValue = commentInputBox.querySelector('.comment-text-holder').value;
+    let isEmpty = !(commentValue.length);
     if(isEmpty) return;
-    console.log("HANDLE SEND PRIVATE");
+
+    let lineIndex = commentInputBox.parentElement.querySelector('.code-line__index').textContent;
+
+    saveToLocalStorage({lineIndex, value: commentValue });
     toggleCommentSection();
 }
 
 const handleSendServer = (e) => {
-    var isEmpty = !(commentInputBox.querySelector('.comment-text-holder').value.length);
+    let commentValue = commentInputBox.querySelector('.comment-text-holder').value;
+    var isEmpty = !(commentValue.length);
     if(isEmpty) return;
-    console.log(isEmpty);
-    console.log("HANDLE SEND SERVER");
+
+    let lineIndex = commentInputBox.parentElement.querySelector('.code-line__index').textContent;
+
+    saveCommentToServer({ lineIndex, value: commentValue });
     toggleCommentSection();
 }
 
@@ -58,6 +65,21 @@ fetchCodeBlocks().then(codeBlock => {
         codeContainer.appendChild(wrapper);
     });
 });
+
+async function fetchAllComments() {
+    const method = 'GET';
+    const headers = { key };
+    const options = {method, headers};
+
+    const response = await fetch(`${baseUrl}/comments`, options);
+    const comments = await response.json();
+    return comments;
+}
+
+fetchAllComments().then(comments => {
+    console.log("COMMENTS: ", comments);
+})
+
 
 const lineMouseEnterHandler = (e) => {
     e.target.classList.add('code-line--highlighted');
@@ -117,3 +139,38 @@ function disableButtons() {
     }
 }
 disableButtons();
+
+function saveToLocalStorage(item) {
+    let localStorageContents = JSON.parse(localStorage.getItem('comments')) || [];
+    let newComment = { [item.lineIndex]: item.value };
+
+    let index = localStorageContents.findIndex(comment => Object.keys(comment)[0] === Object.keys(newComment)[0]);
+
+    if (index !== -1) {
+        localStorageContents[index] = newComment;
+    } else {
+        localStorageContents.push(newComment);
+    }
+    
+    localStorage.setItem('comments', JSON.stringify(localStorageContents));
+}
+
+function saveCommentToServer(item) {
+    method = 'POST';
+    const headers = {
+        "Content-Type": "application/json",
+        key,
+    };
+    const options = {method, headers};
+
+    fetch(`${baseUrl}/create`, {
+        options,
+        body: JSON.stringify({
+            line: item.lineIndex,
+            text: item.value
+        }),
+    })
+    .then(response => response.json())
+    .then(response => console.log(JSON.stringify(response)))
+    .catch(err => {throw new Error("Couldn't create new comment:", err)})
+}
