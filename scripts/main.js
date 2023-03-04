@@ -88,7 +88,7 @@ HTMLElement.prototype.appendCommentSection = function() {
 
 function toggleCommentSection(display) {
     let currentDisplay = commentInputBox.style.display;
-    if(display) {
+    if(display && !(display instanceof Event)) {
         commentInputBox.style.display = display;
         return;
     }
@@ -102,6 +102,7 @@ function getCommentAndBindListeners() {
 
     commentElement.querySelector('.send-private').addEventListener('click', handleSendPrivate);
     commentElement.querySelector('.send').addEventListener('click', handleSendServer);
+    commentElement.querySelector('.close-mark').addEventListener('click', toggleCommentSection);
     
     return commentElement;
 }
