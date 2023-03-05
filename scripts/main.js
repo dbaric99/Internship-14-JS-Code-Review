@@ -19,6 +19,8 @@ const handleSaveComment = (e) => {
         saveCommentToServer({ lineIndex, value: commentValue });
     }
     toggleCommentSection();
+    let updateComments = new CustomEvent('updatecomments');
+    document.dispatchEvent(updateComments);
 }
 
 const codeContainer = document.querySelector('.code-container');
@@ -55,6 +57,11 @@ fetchCodeBlocks().then(codeBlock => {
 
         codeContainer.appendChild(wrapper);
     });
+    let dataReady = new CustomEvent('dataready', { detail: {codeLines} });
+    document.dispatchEvent(dataReady);
+})
+.catch(err => {
+    throw new Error("Error has occured while fetching the code block:", err);
 });
 
 const lineMouseEnterHandler = (e) => {
@@ -116,12 +123,12 @@ function disableButtons() {
 disableButtons();
 
 function saveCommentToLocalStorage(item) {
-    let localStorageContents = JSON.parse(localStorage.getItem('comments')) || [];
-    let newComment = { [item.lineIndex]: item.value };
+    let localStorageComments = JSON.parse(localStorage.getItem('comments')) || [];
+    let newComment = { id: localStorageComments.length,line: item.lineIndex , text: item.value,isLiked: false, createdAt: new Date() };
 
-    localStorageContents.push(newComment);
+    localStorageComments.push(newComment);
     
-    localStorage.setItem('comments', JSON.stringify(localStorageContents));
+    localStorage.setItem('comments', JSON.stringify(localStorageComments));
 }
 
 function saveCommentToServer(item) {
