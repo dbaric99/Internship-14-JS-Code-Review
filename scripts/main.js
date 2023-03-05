@@ -1,5 +1,4 @@
-const baseUrl = 'https://homework-server1.onrender.com';
-const key = 'dbaric99';
+import config from '../config.js';
 
 const handleUpdateInput = (e) => {
     let currentCharCounter = document.querySelector('.count__current');
@@ -7,44 +6,36 @@ const handleUpdateInput = (e) => {
     disableButtons();
 }
 
-const handleSendPrivate = (e) => {
+const handleSaveComment = (e) => {
     let commentValue = commentInputBox.querySelector('.comment-text-holder').value;
     let isEmpty = !(commentValue.length);
     if(isEmpty) return;
 
     let lineIndex = commentInputBox.parentElement.querySelector('.code-line__index').textContent;
 
-    saveToLocalStorage({lineIndex, value: commentValue });
-    toggleCommentSection();
-}
-
-const handleSendServer = (e) => {
-    let commentValue = commentInputBox.querySelector('.comment-text-holder').value;
-    var isEmpty = !(commentValue.length);
-    if(isEmpty) return;
-
-    let lineIndex = commentInputBox.parentElement.querySelector('.code-line__index').textContent;
-
-    saveCommentToServer({ lineIndex, value: commentValue });
+    if(e.target.classList.contains('send-private')) {
+        saveCommentToLocalStorage({lineIndex, value: commentValue });
+    } else {
+        saveCommentToServer({ lineIndex, value: commentValue });
+    }
     toggleCommentSection();
 }
 
 const codeContainer = document.querySelector('.code-container');
 const commentInputBox = getCommentAndBindListeners();
 
-console.log("something is happening");
-
 async function fetchCodeBlocks() {
     const method = 'GET';
-    const headers = { key };
+    const headers = { key: config.apiKey };
     const options = {method, headers};
 
-    const response = await fetch(`${baseUrl}/code`, options);
+    const response = await fetch(`${config.apiUrl}/code`, options);
     const codeBlock = await response.json();
     return codeBlock;
 }
 
 fetchCodeBlocks().then(codeBlock => {
+    if(!codeBlock.code) return;
     var codeLines = codeBlock.code.split('\n');
     codeLines.forEach((line, index) => {
         const lineIndex = document.createElement('span');
@@ -65,21 +56,6 @@ fetchCodeBlocks().then(codeBlock => {
         codeContainer.appendChild(wrapper);
     });
 });
-
-async function fetchAllComments() {
-    const method = 'GET';
-    const headers = { key };
-    const options = {method, headers};
-
-    const response = await fetch(`${baseUrl}/comments`, options);
-    const comments = await response.json();
-    return comments;
-}
-
-fetchAllComments().then(comments => {
-    console.log("COMMENTS: ", comments);
-})
-
 
 const lineMouseEnterHandler = (e) => {
     e.target.classList.add('code-line--highlighted');
@@ -122,8 +98,7 @@ function getCommentAndBindListeners() {
 
     commentElement.querySelector('.comment-text-holder').addEventListener('keyup', handleUpdateInput);
 
-    commentElement.querySelector('.send-private').addEventListener('click', handleSendPrivate);
-    commentElement.querySelector('.send').addEventListener('click', handleSendServer);
+    commentElement.querySelectorAll('.btn-comment').forEach(button => button.addEventListener('click', handleSaveComment));
     commentElement.querySelector('.close-mark').addEventListener('click', toggleCommentSection);
     
     return commentElement;
@@ -140,37 +115,28 @@ function disableButtons() {
 }
 disableButtons();
 
-function saveToLocalStorage(item) {
+function saveCommentToLocalStorage(item) {
     let localStorageContents = JSON.parse(localStorage.getItem('comments')) || [];
     let newComment = { [item.lineIndex]: item.value };
 
-    let index = localStorageContents.findIndex(comment => Object.keys(comment)[0] === Object.keys(newComment)[0]);
-
-    if (index !== -1) {
-        localStorageContents[index] = newComment;
-    } else {
-        localStorageContents.push(newComment);
-    }
+    localStorageContents.push(newComment);
     
     localStorage.setItem('comments', JSON.stringify(localStorageContents));
 }
 
 function saveCommentToServer(item) {
-    method = 'POST';
-    const headers = {
-        "Content-Type": "application/json",
-        key,
-    };
-    const options = {method, headers};
-
-    fetch(`${baseUrl}/create`, {
-        options,
+    fetch(`${config.apiUrl}/create`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            key: config.apiKey,
+        },
         body: JSON.stringify({
             line: item.lineIndex,
-            text: item.value
+            text: item.value,
         }),
     })
     .then(response => response.json())
-    .then(response => console.log(JSON.stringify(response)))
+    .then(response => console.log('Created new comment:', response))
     .catch(err => {throw new Error("Couldn't create new comment:", err)})
 }
