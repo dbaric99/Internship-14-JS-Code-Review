@@ -1,5 +1,7 @@
 import config from '../config.js';
 
+const commentPopOut = document.querySelector('.comment-pop-out');
+
 async function fetchCommentsFromServer() {
     const method = 'GET';
     const headers = { key: config.apiKey };
@@ -26,7 +28,7 @@ function groupCommentsByline(comments) {
 }
 
 function displayComments(serverComments, localComments) {
-    
+
 }
 
 const showCommentsForLine = (e) => {

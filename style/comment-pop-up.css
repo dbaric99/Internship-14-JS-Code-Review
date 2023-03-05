@@ -1,0 +1,67 @@
+.comment-pop-out{
+    background-color: var(--white);
+    width: 70%;
+    height: 70%;
+    position: absolute;
+    z-index: 10;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
+    overflow: scroll;
+    display: none;
+}
+
+.close-pop-out {
+    font-size: 20px;
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    cursor: pointer;
+}
+
+.favorite-icon {
+    height: 25px;
+    width: 25px;
+    cursor: pointer;
+    margin-right: 20px;
+    margin-top: 13px;
+}
+
+.btn-delete {
+    background-color: var(--red);
+}
+
+.comments-holder {
+    padding: 40px;
+}
+
+.posted-comment {
+    display: flex;
+    justify-content: space-between;
+    border-radius: 5px;
+    padding: 10px 20px 20px;
+    margin-bottom: 15px;
+}
+.private {
+    border: 2px solid var(--green);
+    box-shadow: 0 0 2px 2px var(--green);
+}
+.server {
+    border: 2px solid var(--blue);
+    box-shadow: 0 0 2px 2px var(--blue);
+}
+
+.comment-text {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+.comment-timestamp {
+    color: var(--dark-gray);
+}
+
+.comment-actions {
+    display: flex;
+    align-items: center;
+}
