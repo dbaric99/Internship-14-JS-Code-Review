@@ -125,9 +125,9 @@ disableButtons();
 function saveCommentToLocalStorage(item) {
     let localStorageComments = JSON.parse(localStorage.getItem('comments')) || [];
 
-    let newId = localStorageComments.reduce(function(prev, curr) {
+    let newId = localStorageComments.length !== 0 ? localStorageComments.reduce(function(prev, curr) {
         return prev.id > curr.id ? prev : curr;
-    }).id + 1;
+    }).id + 1 : 0;
 
     let newComment = { id: newId,line: item.lineIndex , text: item.value,isLiked: false, createdAt: new Date() };
 
