@@ -32,6 +32,34 @@ function groupCommentsByline(comments) {
 
 function displayComments(serverComments, localComments) {
     commentPopOut.style.display = 'block';
+    serverComments.forEach(comment => {
+        console.log(new Date(comment.createdAt).toLocaleString());
+        let commentElement = document.getElementById('comment-template').cloneNode(true);
+        commentElement.removeAttribute('id');
+        let text = commentElement.querySelector('.comment-text');
+        let timestamp = commentElement.querySelector('.comment-timestamp');
+        let favorite = commentElement.querySelector('.favorite-icon');
+        let deleteButton = commentElement.querySelector('.btn-delete');
+
+        text.textContent = comment.text;
+        timestamp.textContent = new Date(comment.createdAt).toLocaleString();
+        favorite.src = comment.isLiked ? './icons/heart-full.svg' : './icons/heart-empty.svg';
+
+        commentElement.classList.add('server');
+        commentElement.classList.remove('private');
+        
+        favorite.addEventListener('click', () => {
+            let setFavoriteEvent = new CustomEvent('setfavorite', {detail: {comment, updatedData: !comment.isLiked, isFromServer: true}});
+            document.dispatchEvent(setFavoriteEvent); 
+        });
+
+        deleteButton.addEventListener('click', () => {
+            let deleteFromServer = new CustomEvent('deleteserver', {detail: {id: comment.id}});
+            document.dispatchEvent(deleteFromServer);
+        })
+
+        commentsHolder.appendChild(commentElement);
+    })
 }
 
 const showCommentsForLine = (e) => {
@@ -49,4 +77,14 @@ const showCommentsForLine = (e) => {
     })
 }
 
+const handleSetFavorite = (e) => {
+    console.log("SET FAVORITE", e.detail);
+}
+
+const deleteCommentFromServer = (e) => {
+    console.log("DELETE: ", e.detail);
+}
+
 document.addEventListener('showcomments', showCommentsForLine);
+document.addEventListener('deleteserver', deleteCommentFromServer)
+document.addEventListener('setfavorite', handleSetFavorite);

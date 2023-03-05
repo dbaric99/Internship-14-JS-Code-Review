@@ -65,3 +65,7 @@
     display: flex;
     align-items: center;
 }
+
+#comment-template {
+    display: none;
+}
