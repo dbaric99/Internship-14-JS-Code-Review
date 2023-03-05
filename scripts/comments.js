@@ -30,23 +30,30 @@ function groupCommentsByline(comments) {
       }, {});
 }
 
+function createCommentElement(comment, isFromServer) {
+    let commentElement = document.getElementById('comment-template').cloneNode(true);
+    commentElement.removeAttribute('id');
+    let text = commentElement.querySelector('.comment-text');
+    let timestamp = commentElement.querySelector('.comment-timestamp');
+    let favorite = commentElement.querySelector('.favorite-icon');
+
+    text.textContent = comment.text;
+    timestamp.textContent = new Date(comment.createdAt).toLocaleString();
+    favorite.src = comment.isLiked ? './icons/heart-full.svg' : './icons/heart-empty.svg';
+
+    commentElement.classList.add(isFromServer ? 'server' : 'private');
+    commentElement.classList.remove(!isFromServer ? 'server' : 'private');
+
+    return commentElement;
+}
+
 function displayComments(serverComments, localComments) {
     commentPopOut.style.display = 'block';
+
     serverComments.forEach(comment => {
-        console.log(new Date(comment.createdAt).toLocaleString());
-        let commentElement = document.getElementById('comment-template').cloneNode(true);
-        commentElement.removeAttribute('id');
-        let text = commentElement.querySelector('.comment-text');
-        let timestamp = commentElement.querySelector('.comment-timestamp');
+        let commentElement = createCommentElement(comment, true);
         let favorite = commentElement.querySelector('.favorite-icon');
         let deleteButton = commentElement.querySelector('.btn-delete');
-
-        text.textContent = comment.text;
-        timestamp.textContent = new Date(comment.createdAt).toLocaleString();
-        favorite.src = comment.isLiked ? './icons/heart-full.svg' : './icons/heart-empty.svg';
-
-        commentElement.classList.add('server');
-        commentElement.classList.remove('private');
         
         favorite.addEventListener('click', () => {
             let setFavoriteEvent = new CustomEvent('setfavorite', {detail: {comment, updatedData: !comment.isLiked, isFromServer: true}});
@@ -56,6 +63,24 @@ function displayComments(serverComments, localComments) {
         deleteButton.addEventListener('click', () => {
             let deleteFromServer = new CustomEvent('deleteserver', {detail: {id: comment.id}});
             document.dispatchEvent(deleteFromServer);
+        })
+
+        commentsHolder.appendChild(commentElement);
+    });
+
+    localComments.forEach(comment => {
+        let commentElement = createCommentElement(comment, false);
+        let favorite = commentElement.querySelector('.favorite-icon');
+        let deleteButton = commentElement.querySelector('.btn-delete');
+        
+        favorite.addEventListener('click', () => {
+            let setFavoriteEvent = new CustomEvent('setfavorite', {detail: {comment, updatedData: !comment.isLiked, isFromServer: false}});
+            document.dispatchEvent(setFavoriteEvent); 
+        });
+
+        deleteButton.addEventListener('click', () => {
+            let deleteFromStorage = new CustomEvent('deleteprivate', {detail: {id: comment.id}});
+            document.dispatchEvent(deleteFromStorage);
         })
 
         commentsHolder.appendChild(commentElement);
@@ -82,9 +107,14 @@ const handleSetFavorite = (e) => {
 }
 
 const deleteCommentFromServer = (e) => {
-    console.log("DELETE: ", e.detail);
+    console.log("DELETE SERVER: ", e.detail);
+}
+
+const deleteCommentFromStorage = (e) => {
+    console.log("DELETE STORAGE: ", e.detail);
 }
 
 document.addEventListener('showcomments', showCommentsForLine);
-document.addEventListener('deleteserver', deleteCommentFromServer)
+document.addEventListener('deleteserver', deleteCommentFromServer);
+document.addEventListener('deleteprivate', deleteCommentFromStorage);
 document.addEventListener('setfavorite', handleSetFavorite);
