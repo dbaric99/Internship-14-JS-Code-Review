@@ -1,6 +1,9 @@
 import config from '../config.js';
 
 const commentPopOut = document.querySelector('.comment-pop-out');
+const commentsHolder = document.querySelector('.comments-holder');
+
+commentPopOut.querySelector('.close-pop-out').addEventListener('click', (e) => e.target.parentElement.style.display = 'none');
 
 async function fetchCommentsFromServer() {
     const method = 'GET';
@@ -28,7 +31,7 @@ function groupCommentsByline(comments) {
 }
 
 function displayComments(serverComments, localComments) {
-
+    commentPopOut.style.display = 'block';
 }
 
 const showCommentsForLine = (e) => {
