@@ -2,7 +2,6 @@ import config from '../config.js';
 
 const commentPopOut = document.querySelector('.comment-pop-out');
 const commentsHolder = document.querySelector('.comments-holder');
-var commentsLoaded = false;
 
 commentPopOut.querySelector('.close-pop-out').addEventListener('click', (e) => e.target.parentElement.style.display = 'none');
 
@@ -50,45 +49,52 @@ function createCommentElement(comment, isFromServer) {
 
 function displayComments(serverComments, localComments) {
     commentPopOut.style.display = 'block';
-    if(commentsLoaded) return;
-
-    serverComments.forEach(comment => {
-        let commentElement = createCommentElement(comment, true);
-        let favorite = commentElement.querySelector('.favorite-icon');
-        let deleteButton = commentElement.querySelector('.btn-delete');
-        
-        favorite.addEventListener('click', () => {
-            let setFavoriteEvent = new CustomEvent('setfavorite', {detail: {comment, isFromServer: true, commentElement}});
-            document.dispatchEvent(setFavoriteEvent); 
+    commentsHolder.innerHTML="";
+    if(serverComments && serverComments.length !== 0) {
+        serverComments.forEach(comment => {
+            let commentElement = createCommentElement(comment, true);
+            let favorite = commentElement.querySelector('.favorite-icon');
+            let deleteButton = commentElement.querySelector('.btn-delete');
+            
+            favorite.addEventListener('click', () => {
+                let setFavoriteEvent = new CustomEvent('setfavorite', {detail: {comment, isFromServer: true, commentElement}});
+                document.dispatchEvent(setFavoriteEvent); 
+            });
+    
+            deleteButton.addEventListener('click', () => {
+                let deleteFromServer = new CustomEvent('deleteserver', {detail: {id: comment.id, commentElement}});
+                document.dispatchEvent(deleteFromServer);
+            })
+    
+            commentsHolder.appendChild(commentElement);
         });
+    }
 
-        deleteButton.addEventListener('click', () => {
-            let deleteFromServer = new CustomEvent('deleteserver', {detail: {id: comment.id, commentElement}});
-            document.dispatchEvent(deleteFromServer);
+    if(localComments && localComments !== 0) {
+        localComments.forEach(comment => {
+            let commentElement = createCommentElement(comment, false);
+            let favorite = commentElement.querySelector('.favorite-icon');
+            let deleteButton = commentElement.querySelector('.btn-delete');
+            
+            favorite.addEventListener('click', () => {
+                let setFavoriteEvent = new CustomEvent('setfavorite', {detail: {comment, isFromServer: false, commentElement}});
+                document.dispatchEvent(setFavoriteEvent); 
+            });
+    
+            deleteButton.addEventListener('click', () => {
+                let deleteFromStorage = new CustomEvent('deleteprivate', {detail: {id: comment.id, commentElement}});
+                document.dispatchEvent(deleteFromStorage);
+            })
+    
+            commentsHolder.appendChild(commentElement);
         })
+    }
 
-        commentsHolder.appendChild(commentElement);
-    });
-
-    localComments.forEach(comment => {
-        let commentElement = createCommentElement(comment, false);
-        let favorite = commentElement.querySelector('.favorite-icon');
-        let deleteButton = commentElement.querySelector('.btn-delete');
-        
-        favorite.addEventListener('click', () => {
-            let setFavoriteEvent = new CustomEvent('setfavorite', {detail: {comment, isFromServer: false, commentElement}});
-            document.dispatchEvent(setFavoriteEvent); 
-        });
-
-        deleteButton.addEventListener('click', () => {
-            let deleteFromStorage = new CustomEvent('deleteprivate', {detail: {id: comment.id, commentElement}});
-            document.dispatchEvent(deleteFromStorage);
-        })
-
-        commentsHolder.appendChild(commentElement);
-    })
-
-    commentsLoaded = true;
+    if(!localComments && !serverComments) {
+        let message = document.createElement('div');
+        message.textContent = 'No comments';
+        commentsHolder.appendChild(message);
+    } 
 }
 
 const showCommentsForLine = (e) => {
@@ -100,9 +106,6 @@ const showCommentsForLine = (e) => {
         let localCommentsForLine = localStorageComments.length !== 0 ? groupCommentsByline(localStorageComments)[targetCodeLine] : [];
 
         displayComments(serverCommentsForLine, localCommentsForLine);
-    })
-    .catch(err => {
-        throw new Error("Error displaying comments:", err);
     })
 }
 

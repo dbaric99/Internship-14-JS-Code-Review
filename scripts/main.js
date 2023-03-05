@@ -148,7 +148,5 @@ function saveCommentToServer(item) {
             text: item.value,
         }),
     })
-    .then(response => response.json())
-    .then(response => console.log('Created new comment:', response))
     .catch(err => {throw new Error("Couldn't create new comment:", err)})
 }
