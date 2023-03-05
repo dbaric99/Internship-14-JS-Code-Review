@@ -1,6 +1,6 @@
 import config from '../config.js';
 
-async function fetchServerComments() {
+async function fetchCommentsFromServer() {
     const method = 'GET';
     const headers = { key: config.apiKey };
     const options = {method, headers};
@@ -14,14 +14,6 @@ function getCommentsFromLocalStorage() {
     return JSON.parse(localStorage.getItem('comments')) || [];
 }
 
-function displayServerComments() {
-
-}
-
-function displayLocalComments() {
-
-}
-
 function groupCommentsByline(comments) {
     return comments.reduce((acc, comment) => {
         const line = comment.line;
@@ -33,25 +25,23 @@ function groupCommentsByline(comments) {
       }, {});
 }
 
-function displayCommentsInDOM(serverComments, localComments) {
-    console.log("SERVER: ", groupCommentsByline(serverComments));
-    console.log("LOCAL: ", groupCommentsByline(localComments));
+function displayComments(serverComments, localComments) {
     
 }
 
-const displayComments = (e) => {
-    Promise.all([fetchServerComments(), getCommentsFromLocalStorage()])
+const showCommentsForLine = (e) => {
+    Promise.all([fetchCommentsFromServer(), getCommentsFromLocalStorage()])
     .then(([serverComments, localStorageComments]) => {
-        displayCommentsInDOM(serverComments.comments, localStorageComments);
+        let targetCodeLine = e.detail.line;
+
+        let serverCommentsForLine = groupCommentsByline(serverComments.comments)[targetCodeLine];
+        let localCommentsForLine = groupCommentsByline(localStorageComments)[targetCodeLine];
+
+        displayComments(serverCommentsForLine, localCommentsForLine);
     })
     .catch(err => {
         throw new Error("Error displaying comments:", err);
     })
 }
 
-const updateComments = (e) => {
-    console.log("SHOULD UPDATE COMMENTS");
-}
-
-document.addEventListener('dataready', displayComments);
-document.addEventListener('updatecomments', updateComments);
+document.addEventListener('showcomments', showCommentsForLine);

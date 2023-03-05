@@ -11,6 +11,7 @@
 
 .code-line {
     margin-bottom: 5px;
+    cursor: pointer;
 }
 
 .code-line__index {

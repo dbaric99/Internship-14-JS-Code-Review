@@ -19,8 +19,6 @@ const handleSaveComment = (e) => {
         saveCommentToServer({ lineIndex, value: commentValue });
     }
     toggleCommentSection();
-    let updateComments = new CustomEvent('updatecomments');
-    document.dispatchEvent(updateComments);
 }
 
 const codeContainer = document.querySelector('.code-container');
@@ -57,8 +55,6 @@ fetchCodeBlocks().then(codeBlock => {
 
         codeContainer.appendChild(wrapper);
     });
-    let dataReady = new CustomEvent('dataready', { detail: {codeLines} });
-    document.dispatchEvent(dataReady);
 })
 .catch(err => {
     throw new Error("Error has occured while fetching the code block:", err);
@@ -76,6 +72,10 @@ const lineClickHandler = (e) => {
     if(e.target.tagName === 'SPAN') {
         let holder = e.target.closest('.code-line-wrapper');
         holder.appendCommentSection();
+    } else {
+        let lineIndex = e.target.querySelector('span').textContent;
+        let showComments = new CustomEvent('showcomments', { detail: {line: lineIndex }})
+        document.dispatchEvent(showComments);
     }
 }
 
