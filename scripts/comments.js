@@ -81,7 +81,7 @@ function displayComments(serverComments, localComments) {
         });
 
         deleteButton.addEventListener('click', () => {
-            let deleteFromStorage = new CustomEvent('deleteprivate', {detail: {id: comment.id}});
+            let deleteFromStorage = new CustomEvent('deleteprivate', {detail: {id: comment.id, commentElement}});
             document.dispatchEvent(deleteFromStorage);
         })
 
@@ -129,7 +129,10 @@ const handleSetFavorite = (e) => {
         favoriteIcon.src = !e.detail.comment.isLiked ? './icons/heart-full.svg' : './icons/heart-empty.svg';
     } else {
         let localStorageComments = JSON.parse(localStorage.getItem('comments'));
-        localStorageComments[e.detail.comment.id].isLiked = !localStorageComments[e.detail.comment.id].isLiked;
+        var targetCommentIndex = localStorageComments.findIndex((comment) => {
+            return comment.id === e.detail.comment.id;
+        });
+        localStorageComments[targetCommentIndex].isLiked = !localStorageComments[targetCommentIndex].isLiked;
         localStorage.setItem('comments', JSON.stringify(localStorageComments));
 
         e.detail.commentElement.querySelector('.favorite-icon').src = localStorageComments[e.detail.comment.id].isLiked ? './icons/heart-full.svg' : './icons/heart-empty.svg';
@@ -156,7 +159,21 @@ const deleteCommentFromServer = (e) => {
 }
 
 const deleteCommentFromStorage = (e) => {
-    console.log("DELETE STORAGE: ", e.detail);
+    let commentId = e.detail.id;
+    let commentElement = e.detail.commentElement;
+
+    var commentFromStorage = JSON.parse(localStorage.getItem('comments'));
+
+    var targetCommentIndex = commentFromStorage.findIndex((comment) => {
+        return comment.id === commentId;
+    });
+
+    if (targetCommentIndex !== -1) {
+        commentFromStorage.splice(targetCommentIndex, 1);
+        commentElement.style.display = 'none';
+    }
+
+    localStorage.setItem('comments', JSON.stringify(commentFromStorage));
 }
 
 document.addEventListener('showcomments', showCommentsForLine);
